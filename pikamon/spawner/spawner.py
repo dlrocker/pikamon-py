@@ -1,8 +1,9 @@
 import random
 import logging
 
+from discord import Embed
+
 from pikamon.constants import SPAWN_RATE, MAX_POKEMON_ID
-from pikamon.spawner.poke_api import get_pokemon_info, get_pokemon_img
 
 logger = logging.getLogger(__name__)
 
@@ -15,6 +16,8 @@ async def spawn(message, cache):
     ----------
     message : discord.Message
         Discord Message context
+    cache : cachetools.TTLCache
+        Cache object which contains channels that have active pokemon spawns
     """
     channel_name = message.channel
     logger.debug("Attempting to spawn pokemon on channel \"{}\"".format(channel_name))
@@ -29,10 +32,14 @@ async def spawn(message, cache):
     else:
         if random.random() <= SPAWN_RATE:
             logger.info("Spawning new Pokemon!")
-            # TODO - Replace this with some kind of pokemon object that contains the information about the pokemon that was sent to the channel  # noqa: E501
             pokemon_id = random.randint(0, MAX_POKEMON_ID)
-            pokemon = get_pokemon_info(pokemon_id=pokemon_id)
             cache[channel_name] = pokemon_id
-            await message.channel.send("Spawned pokemon!\n{}".format(pokemon["name"]))
+            embeded_msg = Embed(
+                title="‌‌A wild pokémon has appeared!",
+                description="Guess the pokémon аnd type `p!ka catch <pokémon>` to cаtch it!",
+                colour=0x008080
+            )
+            embeded_msg.set_image(url=f"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/{pokemon_id}.png")
+            await message.channel.send(embed=embeded_msg)
         else:
-            logger.info("Pokemon will not be spawned this time")
+            logger.debug("Pokemon will not be spawned this time.")
