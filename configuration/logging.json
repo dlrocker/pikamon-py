@@ -21,6 +21,13 @@
       ],
       "level": "DEBUG",
       "propagate": true
+    },
+    "discord": {
+      "handlers": [
+        "default"
+      ],
+      "level": "DEBUG",
+      "propagate": true
     }
   }
 }

@@ -1,3 +1,3 @@
 
-def test_hello():
+def test_bot():
     assert True
