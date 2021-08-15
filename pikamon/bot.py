@@ -68,6 +68,14 @@ class PikamonBot(commands.Bot):
                 self.load_extension(f"commands.{command}")
 
     async def spawner(self, message):
+        """Spawns a pokemon based on probability if a pokemon has not already been spawned for the channel with the
+        current message being processed
+
+        Parameters
+        ----------
+        message : discord.Message
+            Discord Message context
+        """
         channel_name = message.channel
         logger.debug("Attempting to spawn pokemon on channel \"{}\"".format(channel_name))
 
@@ -90,7 +98,7 @@ class PikamonBot(commands.Bot):
 
     @staticmethod
     def _spawn_pokemon():
-        """Function that determines whether a pokmeon is spawned
+        """Determines whether a pokmeon is spawned based on the spawn rate probability vakue
 
         Returns
         -------
