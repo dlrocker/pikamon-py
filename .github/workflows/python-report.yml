@@ -36,10 +36,10 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Build repo python packages
       run: |
-        # Create wheel package
-        python setup.py bdist_wheel
-        # Install wheel
-        python -m pip install dist/pikamon-py-1.0.0-py2.py3-none-any.whl
+        # Create tar.gz package for python distribution
+        python setup.py sdist --formats=gztar
+        # Install python package for project
+        python -m pip install dist/pikamon-py-1.0.0.tar.gz
     - name: Test with pytest
       run: |
         python -m pytest --verbose --disable-pytest-warnings
