@@ -1,5 +1,6 @@
 # bot requirements
 discord
 cachetools
+requests
 # Test requirements
 pytest
