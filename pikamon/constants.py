@@ -1,2 +1,2 @@
 
-COMMAND_PREFIX = "p!ka"
+COMMAND_PREFIX = "p!ka "

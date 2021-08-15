@@ -26,7 +26,7 @@
       "handlers": [
         "default"
       ],
-      "level": "INFO",
+      "level": "DEBUG",
       "propagate": true
     }
   }

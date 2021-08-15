@@ -22,3 +22,12 @@ Add the bot to the discord server
 4. Under the `BOT PERMISSIONS` section check the boxes for `Read Message History` and `Send Messages`
 5. Navigate to the bot URL you copied in the previous step in a browser
 6. A page will come up which will prompt you to select a server. Select the server you wish to add the bot to, then select `Authorize`.
+
+# Running the Bot
+To run the bot, simply run `bot.py`. Note that before you do this, you must set the following environment variables:
+- `TOKEN`: Your OAuth token from when you created the bot
+
+Different IDEs and editors have different ways to do this. Here are a few ways to do this:
+- Use a `.env` file
+- Add the environment variable to your execution configuration (if using something such as PyCharm, there is a section where you can define environment variables)
+- Manually export the variable if using a UNIX environment

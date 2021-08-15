@@ -1,13 +1,10 @@
 import os
-import sys
 import json
-import logging
 import logging.config
 
-import discord
+from discord.ext import commands
 
 from pikamon.constants import COMMAND_PREFIX
-from pikamon.commands.catch import catch, CATCH_COMMAND
 
 # TODO - Take path to configuration directory as command line parameter
 LOGGING_CONFIG_FILE = os.path.dirname(os.path.realpath(__file__)) + "/../configuration/logging.json"
@@ -17,53 +14,41 @@ logging.config.dictConfig(logging_config)
 logger = logging.getLogger(__name__)
 
 
-class PikamonBot(discord.Client):
-    def __init__(self):
-        super().__init__()
-
-        self.commands = {
-            CATCH_COMMAND: catch
-        }
-
-    async def help(self, message):
-        await message.channel.send("""
-        Welcome to the Pikamon Bot!
-            
-        Here are the list of valid Commands:
-        {}
-        
-        Enjoy!
-        """.format(
-            "\n".join(["- {}".format(c) for c in self.commands.keys()])
-        ))
+class PikamonBot(commands.Bot):
+    def __init__(self, command_prefix=COMMAND_PREFIX):
+        super().__init__(command_prefix)
+        self.command_prefix = command_prefix
 
     async def on_message(self, message):
         logger.debug("Received message from user {}".format(message.author, self.user))
         if message.author == self.user:
             return
 
-        msg_content_list = message.content.lower().split(" ")
-        if msg_content_list[0] != COMMAND_PREFIX:
-            return
+        logger.debug("Going to do stuff with message \"{}\"".format(message.content))
 
-        if len(msg_content_list) <= 2:
-            logger.debug("Invalid command: {}".format(message.content))
-            await self.help(message)
-            return
+        if message.content.lower().startswith(self.command_prefix):
+            # If this is a command, we need to call the process_commands() function from parent class to deal with it
+            logger.debug("Processing command...")
+            await self.process_commands(message)
+        else:
+            # If the message is not a bot command message, we need to do stuff with it ourselves (spawn pokemon if able)
+            await message.channel.send("Working on message \"{}\"".format(message.content))
 
-        command = self.commands.get(msg_content_list[1])
-        if command is not None:
-            await catch(message)
-
-    # async def on_disconnect(self):
-    #     logger.info("Disconnecting bot")
+    def load_extensions(self) -> None:
+        """Load all enabled extensions and commands for this bot."""
+        for command_py in os.listdir("commands"):
+            if command_py.endswith(".py") and command_py != "__init__.py":
+                command = command_py[:-3]  # Remove trailing ".py"
+                logger.debug(f"Loading command extension 'commands.{command}'")
+                self.load_extension(f"commands.{command}")
 
 
 def main(token):
-    client = PikamonBot()
+    client = PikamonBot(command_prefix=COMMAND_PREFIX)
+    client.load_extensions()
     client.run(token)
 
 
 if __name__ == "__main__":
-    oauth_token = sys.argv[1]
+    oauth_token = os.environ.get("TOKEN")
     main(oauth_token)
