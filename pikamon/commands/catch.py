@@ -16,11 +16,12 @@ async def catch(message):
 class Catch(commands.Cog):
     """Catches the spawned Pokemon"""
     def __init__(self, bot):
-        """
+        """Catches the spawned Pokemon
 
         Parameters
         ----------
         bot : commands.Bot
+            Bot instance to setup the command for
         """
         logger.debug("Setting up Catch()")
         self.bot = bot
@@ -54,10 +55,7 @@ def setup(bot):
     Parameters
     ----------
     bot : commands.Bot
-
-    Returns
-    -------
-
+        Bot instance to setup the command for
     """
     logger.debug("Calling setup() for Catch()")
     bot.add_cog(Catch(bot))

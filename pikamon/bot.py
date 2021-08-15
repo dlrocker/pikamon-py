@@ -20,6 +20,16 @@ class PikamonBot(commands.Bot):
         self.command_prefix = command_prefix
 
     async def on_message(self, message):
+        """Processes messages posted to channels in the Discord server
+
+        If it is a bot command it will be processed by the loaded command extension. If it is not a bot command,
+        it will attempt to spawn a pokemon if no pokemon has already been spawned in the channel.
+
+        Parameters
+        ----------
+        message : discord.Message
+            Discord Message context
+        """
         logger.debug("Received message from user {}".format(message.author, self.user))
         if message.author == self.user:
             return
