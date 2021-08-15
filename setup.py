@@ -7,8 +7,10 @@ script_directory = path.abspath(path.dirname(__file__))
 with open(path.join(script_directory, 'README.md'), encoding='utf-8') as f:
     readme = f.read()
 
-with open(path.join(script_directory, 'requirements.txt'), encoding='utf-8') as f:
-    install_requirements = f.readlines()
+install_requirements = [
+    "discord>=1.7.3",
+    "cachetools>=4.2.2"
+]
 
 setup(
     name="pikamon-py",
