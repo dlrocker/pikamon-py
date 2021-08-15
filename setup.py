@@ -22,7 +22,7 @@ setup(
     classifiers=[
         "Private :: Do not upload to pypi server"
     ],
-    keywords="Stock Analysis",
+    keywords="Pikamon",
     packages=find_namespace_packages(include=["pikamon.*"], exclude=["tests"]),
     python_requires=">=3.9",
     install_requires=install_requirements,
