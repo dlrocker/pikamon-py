@@ -9,7 +9,8 @@ with open(path.join(script_directory, 'README.md'), encoding='utf-8') as f:
 
 install_requirements = [
     "discord>=1.7.3",
-    "cachetools>=4.2.2"
+    "cachetools>=4.2.2",
+    "requests>=2.26.0"
 ]
 
 setup(

@@ -1,12 +1,12 @@
 import os
 import json
-import random
 import logging.config
 
 from discord.ext import commands
 from cachetools import TTLCache
 
-from pikamon.constants import COMMAND_PREFIX, SPAWN_RATE, Cache
+from pikamon.constants import COMMAND_PREFIX, Cache
+from pikamon.spawner.spawner import spawn
 
 # TODO - Take path to configuration directory as command line parameter
 LOGGING_CONFIG_FILE = os.path.dirname(os.path.realpath(__file__)) + "/../configuration/logging.json"
@@ -57,7 +57,7 @@ class PikamonBot(commands.Bot):
             await self.process_commands(message)
         else:
             # If the message is not a bot command message, we need to do stuff with it ourselves (spawn pokemon if able)
-            await self.spawner(message)
+            await spawn(message, self.cache)
 
     def load_extensions(self) -> None:
         """Load all enabled extensions and commands for this bot."""
@@ -66,47 +66,6 @@ class PikamonBot(commands.Bot):
                 command = command_py[:-3]  # Remove trailing ".py"
                 logger.debug(f"Loading command extension 'commands.{command}'")
                 self.load_extension(f"commands.{command}")
-
-    async def spawner(self, message):
-        """Spawns a pokemon based on probability if a pokemon has not already been spawned for the channel with the
-        current message being processed
-
-        Parameters
-        ----------
-        message : discord.Message
-            Discord Message context
-        """
-        channel_name = message.channel
-        logger.debug("Attempting to spawn pokemon on channel \"{}\"".format(channel_name))
-
-        # Clear all channel caches so that if a pokemon has expired, it is no longer available
-        # TODO - Print message when pokemon for channel expires. May need to extend TTLCache and edit the following:
-        # - https://github.com/tkem/cachetools/blob/master/src/cachetools/ttl.py#L158
-        self.cache.expire()
-
-        if channel_name in self.cache:
-            logger.info("A pokemon has already been spawned for channel \"{}\"".format(channel_name))
-        else:
-            if self._spawn_pokemon():
-                logger.info("Spawning new Pokemon!")
-                # TODO - Replace this with some kind of pokemon object that contains the information about the pokemon that was sent to the channel  # noqa: E501
-                pokemon = "<some_pokemon>"
-                self.cache[channel_name] = pokemon
-                await message.channel.send("Spawned pokemon!\n{}".format(pokemon))
-            else:
-                logger.info("Pokemon will not be spawned this time")
-
-    @staticmethod
-    def _spawn_pokemon():
-        """Determines whether a pokmeon is spawned based on the spawn rate probability vakue
-
-        Returns
-        -------
-        bool
-            True if a pokemon should be spawned, False if not
-        """
-        r = random.random()  # Generates number in range [0, 1)
-        return r < SPAWN_RATE
 
 
 def main(token):
