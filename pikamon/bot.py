@@ -44,7 +44,7 @@ class PikamonBot(commands.Bot):
         message : discord.Message
             Discord Message context
         """
-        logger.debug("Received message from user {}".format(message.author, self.user))
+        logger.debug("Received message from user {}".format(message.author))
         if message.author == self.user:
             logger.debug("Ignoring message from {}".format(self.user))
             return
