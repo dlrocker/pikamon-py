@@ -3,6 +3,8 @@ Python native Pokemon bot for Discord
 
 [![python-report Actions Status](https://github.com/dlrocker/pikamon-py/workflows/python-report/badge.svg?branch=main)](https://github.com/dlrocker/pikamon-py/actions)
 
+Please see the [Wiki Page](https://github.com/dlrocker/pikamon-py/wiki) for more information about the bots design.
+
 # Adding bot to server
 Create a server if you do not have on already
 1. Create a discord server
