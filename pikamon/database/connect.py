@@ -8,6 +8,15 @@ logger = logging.getLogger(__name__)
 
 
 def create_bot_tables(conn, tables):
+    """Create the tables required for our Pikamon bot in SQLite
+
+    Parameters
+    ----------
+    conn : sqlite3.Connection
+        SQLite Connection Object
+    tables : list of str
+        List of filepaths to SQL definition files of our tables
+    """
     cursor = conn.cursor()
 
     for table in tables:
@@ -44,6 +53,18 @@ def create_connection(database_path=None, database=DATABASE_NAME):
 
 
 def setup_database(database_path=None, db_name=DATABASE_NAME, table_sql_path=None):
+    """Sets up our database connection and creates all necessary tables for our bot in SQLite
+
+    Parameters
+    ----------
+    database_path : str
+        Directory path for where to write out the database to
+    db_name : str
+        Name of the database to create under the specified path
+    table_sql_path : str
+        Directory path to where the SQL definition files for our database are stored. This should not include
+        the SQL definition file names.
+    """
     conn = create_connection(database_path, db_name)
     if not table_sql_path:
         database_config_path = os.environ.get(DATABASE_CONFIG_PATH_ENV_VAR)
@@ -70,8 +91,3 @@ def setup_database(database_path=None, db_name=DATABASE_NAME, table_sql_path=Non
     conn.commit()
 
     return conn
-
-
-if __name__ == "__main__":
-    connection = setup_database()
-    connection.close()
