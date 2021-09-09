@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS pokemon (
+   id INTEGER PRIMARY KEY AUTOINCREMENT,
+   trainer_id CHAR(32) NOT NULL,
+   pokemon_number INTEGER NOT NULL,
+   pokemon_name CHAR(32) NOT NULL,
+   pokemon_level INTEGER NOT NULL,
+   FOREIGN KEY (trainer_id) REFERENCES users (user_id) ON UPDATE CASCADE ON DELETE CASCADE
+);
