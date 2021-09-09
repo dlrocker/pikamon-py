@@ -16,6 +16,8 @@ jobs:
     strategy:
       matrix:
         python-version: [3.9]
+    env:
+      DATABASE_CONFIG_PATH: ${{env.working-directory}}
 
     steps:
     - uses: actions/checkout@v2
