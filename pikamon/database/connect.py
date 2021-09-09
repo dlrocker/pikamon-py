@@ -1,13 +1,17 @@
 import sqlite3
 import os
+import logging
 
-from pikamon.constants import DATABASE_NAME
+from pikamon.constants import DATABASE_NAME, DATABASE_CONFIG_PATH_ENV_VAR
+
+logger = logging.getLogger(__name__)
 
 
 def create_bot_tables(conn, tables):
     cursor = conn.cursor()
 
     for table in tables:
+        logger.info(f"Creating table {table} if it does not exist.")
         with open(table, 'r') as f:
             create_table_sql = "".join(f.readlines())
         cursor.execute(create_table_sql)
@@ -42,13 +46,20 @@ def create_connection(database_path=None, database=DATABASE_NAME):
 def setup_database(database_path=None, db_name=DATABASE_NAME, table_sql_path=None):
     conn = create_connection(database_path, db_name)
     if not table_sql_path:
-        table_sql_path = os.path.join(
-            os.path.dirname(os.path.realpath(__file__)),
-            "..",
-            "..",
-            "configuration",
-            "database"
-        )
+        database_config_path = os.environ.get(DATABASE_CONFIG_PATH_ENV_VAR)
+        if database_config_path and os.path.isdir(database_config_path):
+            logger.info("Using environment variable '{}' to define the path to the table SQL definitions".format(
+                DATABASE_CONFIG_PATH_ENV_VAR))
+            table_sql_path = os.environ.get(DATABASE_CONFIG_PATH_ENV_VAR)
+        else:
+            table_sql_path = os.path.join(
+                os.path.dirname(os.path.realpath(__file__)),
+                "..",
+                "..",
+                "configuration",
+                "database"
+            )
+    logger.debug("Using '{}' as the path to the SQL file definitions of the bot tables in SQLite".format(table_sql_path))
     tables = [
         os.path.join(table_sql_path, "users.sql"),
         os.path.join(table_sql_path, "pokemon.sql")
@@ -56,6 +67,8 @@ def setup_database(database_path=None, db_name=DATABASE_NAME, table_sql_path=Non
     create_bot_tables(conn, tables)
     # Enforce foreign keys
     conn.execute("PRAGMA foreign_keys = 1")
+    conn.commit()
+
     return conn
 
 
