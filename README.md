@@ -30,6 +30,8 @@ Add the bot to the discord server
 # Running the Bot
 To run the bot, simply run `bot.py`. Note that before you do this, you must set the following environment variables:
 - `TOKEN`: Your OAuth token from when you created the bot
+- `DATABASE_CONFIG_PATH`: Path to the SQL definition files of the SQLite tables for the Pikamon bot. By default,
+    it is under this projects [database configuration](https://github.com/dlrocker/pikamon-py/tree/main/configuration/database) directory.
 
 Different IDEs and editors have different ways to do this. Here are a few ways to do this:
 - Use a `.env` file
