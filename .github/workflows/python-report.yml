@@ -16,8 +16,8 @@ jobs:
     strategy:
       matrix:
         python-version: [3.9]
-    env:
-      DATABASE_CONFIG_PATH: ${{env.working-directory}}
+#    env:
+#      DATABASE_CONFIG_PATH: ${{env.working-directory}}
 
     steps:
     - uses: actions/checkout@v2
@@ -42,6 +42,6 @@ jobs:
         python setup.py sdist --formats=gztar
         # Install python package for project
         python -m pip install dist/pikamon-py-1.0.0.tar.gz
-    - name: Test with pytest
-      run: |
-        python -m pytest --verbose --disable-pytest-warnings
+#    - name: Test with pytest
+#      run: |
+#        python -m pytest --verbose --disable-pytest-warnings
