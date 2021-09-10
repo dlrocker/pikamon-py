@@ -4,6 +4,7 @@ import random
 import discord
 from discord import Embed
 
+from pikamon.commands.register import is_registered
 from pikamon.constants import Pokemon, SqliteDB, DiscordMessage
 
 logger = logging.getLogger(__name__)
@@ -37,6 +38,7 @@ def __catch_pokemon(message, cache, sqlite_conn, pokemon_name, author):
             insert_pokemon,
             (author, pokemon_id, pokemon_name, random.randint(Pokemon.MIN_LEVEL, Pokemon.MAX_LEVEL))
         )
+        sqlite_conn.commit()
 
 
 async def catch_pokemon(message, cache, registered_trainers, sqlite_conn):
@@ -64,12 +66,8 @@ async def catch_pokemon(message, cache, registered_trainers, sqlite_conn):
 
     # use str(...) so that we get the username along with their unique username ID. Example: someuser#1234
     author = str(message.author)
-    if author not in registered_trainers:
-        await message.channel.send(embed=Embed(
-            description=f"Whoops! {message.author.mention} you are not a registered trainer! Please "
-            + "register before catching pokemon!",
-            colour=DiscordMessage.COLOR
-        ))
+    registered = await is_registered(message, registered_trainers, author)
+    if not registered:
         return
 
     message_content = message.content.lower().split(" ")
