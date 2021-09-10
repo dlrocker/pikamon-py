@@ -28,6 +28,35 @@ def get_registered_trainers(sqlite_conn):
     return {record[0] for record in result}
 
 
+async def is_registered(message, registered_trainers, author):
+    """Checks whether a author is a registered trainer. If they are not, it posts a message to Discord telling the
+    author to register.
+
+    Parameters
+    ----------
+    message : discord.Message
+        Discord message object which executed the pokemon bot catch command
+    registered_trainers : set
+        Python Set() containing all previously registered trainers. Note: This set will be mutated when adding
+        new trainers.
+    author : str
+        Author Name
+
+    Returns
+    -------
+    bool
+        True if the trainer was registered, False otherwise.
+    """
+    if author not in registered_trainers:
+        await message.channel.send(embed=Embed(
+            description=f"Whoops! {message.author.mention} you are not a registered trainer! Please "
+            + "register with the bot before executing commands!",
+            colour=DiscordMessage.COLOR
+        ))
+        return False
+    return True
+
+
 async def register_trainer(message, registered_trainers, sqlite_conn):
     """Logic to register a new trainer
 

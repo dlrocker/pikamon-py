@@ -9,6 +9,7 @@ from pikamon.constants import COMMAND_PREFIX, Cache, SqliteDB
 from pikamon.spawner.spawner import spawn
 from pikamon.commands.catch import catch_pokemon
 from pikamon.commands.register import get_registered_trainers, register_trainer
+from pikamon.commands.list import list_pokemon
 from pikamon.database.connect import setup_database
 
 # TODO - Take path to configuration directory as command line parameter
@@ -47,6 +48,17 @@ async def catch(message):
     <pokemon_name> - Name of pokemon to catch
     """
     await catch_pokemon(message.message, cache, registered_trainers, sqlite_conn)
+
+
+@bot.command(name="list")
+async def list_trainers_pokemon(message):
+    """Lists all Pokemon caught by a trainer
+
+    Command from discord: p!ka list
+    p!ka - Bot command prefix
+    list - Specifies to list all Pokemon caught by trainer
+    """
+    await list_pokemon(message.message, registered_trainers, sqlite_conn)
 
 
 @bot.event
