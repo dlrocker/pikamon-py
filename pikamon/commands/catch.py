@@ -8,7 +8,6 @@ from discord import Embed
 from pikamon.constants import USER_TABLE, POKEMON_TABLE, MIN_POKEMON_LEVEL, MAX_POKEMON_LEVEL
 
 logger = logging.getLogger(__name__)
-CATCH_COMMAND = "catch"
 
 
 def __catch_pokemon(message, cache, sqlite_conn, pokemon_name):
@@ -68,7 +67,7 @@ def __catch_pokemon(message, cache, sqlite_conn, pokemon_name):
             sqlite_conn.commit()
 
 
-async def catch(message, cache, sqlite_conn):
+async def catch_pokemon(message, cache, sqlite_conn):
     """Perform the catch command on a pokemon specified by the user.
 
     Parameters

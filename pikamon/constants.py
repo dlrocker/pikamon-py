@@ -1,5 +1,5 @@
 # Prefix used for the Bot commands
-COMMAND_PREFIX = "p!ka"
+COMMAND_PREFIX = "p!ka "
 
 # SQLite database name
 DATABASE_CONFIG_PATH_ENV_VAR = "DATABASE_CONFIG_PATH"

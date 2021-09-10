@@ -7,7 +7,7 @@ from cachetools import TTLCache
 
 from pikamon.constants import COMMAND_PREFIX, Cache, DATABASE_CONFIG_PATH_ENV_VAR
 from pikamon.spawner.spawner import spawn
-from pikamon.commands.catch import CATCH_COMMAND, catch
+from pikamon.commands.catch import catch_pokemon
 from pikamon.database.connect import setup_database
 
 # TODO - Take path to configuration directory as command line parameter
@@ -22,9 +22,18 @@ table_sql_path = os.environ.get(DATABASE_CONFIG_PATH_ENV_VAR)
 sqlite_conn = setup_database(table_sql_path=table_sql_path)
 cache = TTLCache(maxsize=Cache.MAX_SIZE, ttl=Cache.TTL)
 bot = commands.Bot(command_prefix=COMMAND_PREFIX)
-registered_commands = {
-    CATCH_COMMAND: catch
-}
+
+
+@bot.command()
+async def catch(message):
+    """Catch a pokemon
+
+    Command from discord: p!ka catch <pokemon_name>
+    p!ka - Command prefix
+    catch - Command to perform
+    <pokemon_name> - Name of pokemon to catch
+    """
+    await catch_pokemon(message.message, cache, sqlite_conn)
 
 
 @bot.event
@@ -46,14 +55,7 @@ async def on_message(message):
 
     message_content = message.content.lower()
     if message_content.startswith(COMMAND_PREFIX):
-        # If this is a command, we need to call the process_commands() function from parent class to deal with it
-        logger.debug(f"Processing command: {message_content}")
-        command_statement = message_content.split(" ")
-        if len(command_statement) >= 2 and command_statement[1] in registered_commands:
-            command = registered_commands.get(command_statement[1])
-            await command(message, cache, sqlite_conn)
-        else:
-            await message.channel.send("Unknown command \"{}\"".format(message_content))
+        await bot.process_commands(message)
     else:
         # If the message is not a bot command message, we need to do stuff with it ourselves (spawn pokemon if able)
         await spawn(message, cache)
