@@ -64,6 +64,11 @@ def setup_database(database_path=None, db_name=DATABASE_NAME, table_sql_path=Non
     table_sql_path : str
         Directory path to where the SQL definition files for our database are stored. This should not include
         the SQL definition file names.
+
+    Returns
+    -------
+    connection: sqlite3.Connection
+        SQLite Connection Object
     """
     conn = create_connection(database_path, db_name)
     if not table_sql_path:

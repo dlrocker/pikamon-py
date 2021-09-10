@@ -5,8 +5,10 @@ import logging.config
 from discord.ext import commands
 from cachetools import TTLCache
 
-from pikamon.constants import COMMAND_PREFIX, Cache
+from pikamon.constants import COMMAND_PREFIX, Cache, DATABASE_CONFIG_PATH_ENV_VAR
 from pikamon.spawner.spawner import spawn
+from pikamon.commands.catch import CATCH_COMMAND, catch
+from pikamon.database.connect import setup_database
 
 # TODO - Take path to configuration directory as command line parameter
 LOGGING_CONFIG_FILE = os.path.dirname(os.path.realpath(__file__)) + "/../configuration/logging.json"
@@ -16,64 +18,46 @@ logging.config.dictConfig(logging_config)
 logger = logging.getLogger(__name__)
 
 
-class PikamonBot(commands.Bot):
-    def __init__(self, command_prefix=COMMAND_PREFIX):
-        super().__init__(command_prefix)
-        self.command_prefix = command_prefix
-        """
-        I believe discord API is not using threading (as evident of using async/await). So for now, I am leaving out
-        code to get a lock unless I learn otherwise. The reason this is important is because we need to make sure only
-        a single thread is modifying the cache at a time. Code to get the lock if necessary:
-        
-        from threading import Lock
-        self.lock = Lock()
-        ...
-        with self.lock:
-            ...do stuff...
-        """
-        self.cache = TTLCache(maxsize=Cache.MAX_SIZE, ttl=Cache.TTL)
+table_sql_path = os.environ.get(DATABASE_CONFIG_PATH_ENV_VAR)
+sqlite_conn = setup_database(table_sql_path=table_sql_path)
+cache = TTLCache(maxsize=Cache.MAX_SIZE, ttl=Cache.TTL)
+bot = commands.Bot(command_prefix=COMMAND_PREFIX)
+registered_commands = {
+    CATCH_COMMAND: catch
+}
 
-    async def on_message(self, message):
-        """Processes messages posted to channels in the Discord server
 
-        If it is a bot command it will be processed by the loaded command extension. If it is not a bot command,
-        it will attempt to spawn a pokemon if no pokemon has already been spawned in the channel.
+@bot.event
+async def on_message(message):
+    """Processes messages posted to channels in the Discord server
 
-        Parameters
-        ----------
-        message : discord.Message
-            Discord Message context
-        """
-        logger.debug("Received message from user {}".format(message.author))
-        if message.author == self.user:
-            logger.debug("Ignoring message from {}".format(self.user))
-            return
+    If it is a bot command it will be processed by the loaded command extension. If it is not a bot command,
+    it will attempt to spawn a pokemon if no pokemon has already been spawned in the channel.
 
-        logger.debug("Going to do stuff with message \"{}\"".format(message.content))
+    Parameters
+    ----------
+    message : discord.Message
+        Discord Message context
+    """
+    logger.debug("Received message from user {}".format(message.author))
+    if message.author == bot.user:
+        # Ignore messages from the Pokemon bot
+        return
 
-        if message.content.lower().startswith(self.command_prefix):
-            # If this is a command, we need to call the process_commands() function from parent class to deal with it
-            logger.debug("Processing command...")
-            await self.process_commands(message)
+    message_content = message.content.lower()
+    if message_content.startswith(COMMAND_PREFIX):
+        # If this is a command, we need to call the process_commands() function from parent class to deal with it
+        logger.debug(f"Processing command: {message_content}")
+        command_statement = message_content.split(" ")
+        if len(command_statement) >= 2 and command_statement[1] in registered_commands:
+            command = registered_commands.get(command_statement[1])
+            await command(message, cache, sqlite_conn)
         else:
-            # If the message is not a bot command message, we need to do stuff with it ourselves (spawn pokemon if able)
-            await spawn(message, self.cache)
-
-    def load_extensions(self) -> None:
-        """Load all enabled extensions and commands for this bot."""
-        for command_py in os.listdir("commands"):
-            if command_py.endswith(".py") and command_py != "__init__.py":
-                command = command_py[:-3]  # Remove trailing ".py"
-                logger.debug(f"Loading command extension 'commands.{command}'")
-                self.load_extension(f"commands.{command}")
+            await message.channel.send("Unknown command \"{}\"".format(message_content))
+    else:
+        # If the message is not a bot command message, we need to do stuff with it ourselves (spawn pokemon if able)
+        await spawn(message, cache)
 
 
-def main(token):
-    client = PikamonBot(command_prefix=COMMAND_PREFIX)
-    client.load_extensions()
-    client.run(token)
-
-
-if __name__ == "__main__":
-    oauth_token = os.environ.get("TOKEN")
-    main(oauth_token)
+oauth_token = os.environ.get("TOKEN")
+bot.run(oauth_token)
