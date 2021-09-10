@@ -2,7 +2,7 @@ import sqlite3
 import os
 import logging
 
-from pikamon.constants import DATABASE_NAME, DATABASE_CONFIG_PATH_ENV_VAR
+from pikamon.constants import SqliteDB
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ def create_bot_tables(conn, tables):
     conn.commit()
 
 
-def create_connection(database_path=None, database=DATABASE_NAME):
+def create_connection(database_path=None, database=SqliteDB.DATABASE_NAME):
     """Creates a connection to the SQLite database for the bot
 
     Parameters
@@ -52,7 +52,7 @@ def create_connection(database_path=None, database=DATABASE_NAME):
         return sqlite3.connect(database)
 
 
-def setup_database(database_path=None, db_name=DATABASE_NAME, table_sql_path=None):
+def setup_database(database_path=None, db_name=SqliteDB.DATABASE_NAME, table_sql_path=None):
     """Sets up our database connection and creates all necessary tables for our bot in SQLite
 
     Parameters
@@ -72,11 +72,11 @@ def setup_database(database_path=None, db_name=DATABASE_NAME, table_sql_path=Non
     """
     conn = create_connection(database_path, db_name)
     if not table_sql_path:
-        database_config_path = os.environ.get(DATABASE_CONFIG_PATH_ENV_VAR)
+        database_config_path = os.environ.get(SqliteDB.DATABASE_CONFIG_PATH_ENV_VAR)
         if database_config_path and os.path.isdir(database_config_path):
             logger.info("Using environment variable '{}' to define the path to the table SQL definitions".format(
-                DATABASE_CONFIG_PATH_ENV_VAR))
-            table_sql_path = os.environ.get(DATABASE_CONFIG_PATH_ENV_VAR)
+                SqliteDB.DATABASE_CONFIG_PATH_ENV_VAR))
+            table_sql_path = os.environ.get(SqliteDB.DATABASE_CONFIG_PATH_ENV_VAR)
         else:
             table_sql_path = os.path.join(
                 os.path.dirname(os.path.realpath(__file__)),
@@ -85,7 +85,8 @@ def setup_database(database_path=None, db_name=DATABASE_NAME, table_sql_path=Non
                 "configuration",
                 "database"
             )
-    logger.debug("Using '{}' as the path to the SQL file definitions of the bot tables in SQLite".format(table_sql_path))
+    logger.debug(
+        "Using '{}' as the path to the SQL file definitions of the bot tables in SQLite".format(table_sql_path))
     tables = [
         os.path.join(table_sql_path, "users.sql"),
         os.path.join(table_sql_path, "pokemon.sql")
@@ -94,5 +95,4 @@ def setup_database(database_path=None, db_name=DATABASE_NAME, table_sql_path=Non
     # Enforce foreign keys
     conn.execute("PRAGMA foreign_keys = 1")
     conn.commit()
-
     return conn

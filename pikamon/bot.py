@@ -5,7 +5,7 @@ import logging.config
 from discord.ext import commands
 from cachetools import TTLCache
 
-from pikamon.constants import COMMAND_PREFIX, Cache, DATABASE_CONFIG_PATH_ENV_VAR
+from pikamon.constants import COMMAND_PREFIX, Cache, SqliteDB
 from pikamon.spawner.spawner import spawn
 from pikamon.commands.catch import catch_pokemon
 from pikamon.commands.register import get_registered_trainers, register_trainer
@@ -19,10 +19,10 @@ logging.config.dictConfig(logging_config)
 logger = logging.getLogger(__name__)
 
 
-table_sql_path = os.environ.get(DATABASE_CONFIG_PATH_ENV_VAR)
-sqlite_conn = setup_database(table_sql_path=table_sql_path)
-cache = TTLCache(maxsize=Cache.MAX_SIZE, ttl=Cache.TTL)
-registered_trainers = get_registered_trainers(sqlite_conn)
+table_sql_path = os.environ.get(SqliteDB.DATABASE_CONFIG_PATH_ENV_VAR)
+sqlite_conn = setup_database(table_sql_path=table_sql_path)     # SQLite Database connection object
+cache = TTLCache(maxsize=Cache.MAX_SIZE, ttl=Cache.TTL)         # TTL Cache for spawned pokemon
+registered_trainers = get_registered_trainers(sqlite_conn)      # Already registered trainers
 bot = commands.Bot(command_prefix=COMMAND_PREFIX)
 
 

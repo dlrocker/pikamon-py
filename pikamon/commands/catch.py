@@ -1,11 +1,10 @@
 import logging
-from datetime import datetime
 import random
 
 import discord
 from discord import Embed
 
-from pikamon.constants import USER_TABLE, POKEMON_TABLE, MIN_POKEMON_LEVEL, MAX_POKEMON_LEVEL
+from pikamon.constants import Pokemon, SqliteDB, DiscordMessage
 
 logger = logging.getLogger(__name__)
 
@@ -33,18 +32,11 @@ def __catch_pokemon(message, cache, sqlite_conn, pokemon_name, author):
     if True:
         pokemon_id = cache.pop(message.channel)
         insert_pokemon = '''INSERT INTO {table} (trainer_id, pokemon_number, pokemon_name, pokemon_level) VALUES (
-                    ?, ?, ?, ?);'''.format(table=POKEMON_TABLE)
+                    ?, ?, ?, ?);'''.format(table=SqliteDB.POKEMON_TABLE)
         cursor.execute(
             insert_pokemon,
-            (author, pokemon_id, pokemon_name, random.randint(MIN_POKEMON_LEVEL, MAX_POKEMON_LEVEL))
+            (author, pokemon_id, pokemon_name, random.randint(Pokemon.MIN_LEVEL, Pokemon.MAX_LEVEL))
         )
-
-        # TODO - Remove when no longer debugging. We don't want to print the whole pokemon database everytime...
-        if logger.isEnabledFor(logging.DEBUG):
-            cursor.execute('''SELECT * from pokemon;'''.format(author))
-            result = cursor.fetchall()
-            logger.debug(result)
-            sqlite_conn.commit()
 
 
 async def catch_pokemon(message, cache, registered_trainers, sqlite_conn):
@@ -76,7 +68,7 @@ async def catch_pokemon(message, cache, registered_trainers, sqlite_conn):
         await message.channel.send(embed=Embed(
             description=f"Whoops! {message.author.mention} you are not a registered trainer! Please "
             + "register before catching pokemon!",
-            colour=0x008080
+            colour=DiscordMessage.COLOR
         ))
         return
 
@@ -93,7 +85,7 @@ async def catch_pokemon(message, cache, registered_trainers, sqlite_conn):
         __catch_pokemon(message, cache, sqlite_conn, pokemon_name, author)
         await message.channel.send(embed=Embed(
             description=f"Congratulations {message.author.mention}, you caught a \"{pokemon_name}\"!",
-            colour=0x008080
+            colour=DiscordMessage.COLOR
         ))
     else:
         await message.channel.send("The pokemon ran away!")
