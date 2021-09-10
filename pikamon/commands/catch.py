@@ -8,7 +8,6 @@ from discord import Embed
 from pikamon.constants import USER_TABLE, POKEMON_TABLE, MIN_POKEMON_LEVEL, MAX_POKEMON_LEVEL
 
 logger = logging.getLogger(__name__)
-CATCH_COMMAND = "catch"
 
 
 def __catch_pokemon(message, cache, sqlite_conn, pokemon_name):
@@ -68,46 +67,6 @@ def __catch_pokemon(message, cache, sqlite_conn, pokemon_name):
             sqlite_conn.commit()
 
 
-# async def catch(message, cache, sqlite_conn):
-#     """Perform the catch command on a pokemon specified by the user.
-#
-#     Parameters
-#     ----------
-#     message : discord.Message
-#         Discord message object which executed the pokemon bot catch command
-#     cache : cachetools.TTLCache
-#         A TTL LRU cache to store channels which contain spawned pokemon
-#     sqlite_conn : sqlite3.Connection
-#         SQLite Connection Object
-#
-#     Examples
-#     -------
-#     Command from discord: p!ka catch <pokemon_name>
-#     p!ka - Command prefix
-#     catch - Command to perform
-#     <pokemon_name> - Name of pokemon to catch
-#     """
-#     cache.expire()  # Remove any expired entries from the cache
-#
-#     message_content = message.content.lower().split(" ")
-#     if len(message_content) != 3:
-#         await message.channel.send("Invalid catch command!")
-#         # TODO - Remove this if we can overwrite the on_error bot functionality to automatically send a
-#         #  message to the channel where the error occurred.
-#         raise discord.DiscordException("Invalid catch command")
-#
-#     pokemon_name = message_content[2]
-#     logger.debug(f"Performing catch on user specified pokemon \"{pokemon_name}\"...")
-#     if message.channel in cache:
-#         __catch_pokemon(message, cache, sqlite_conn, pokemon_name)
-#         await message.channel.send(embed=Embed(
-#             description=f"Congrats {message.author.mention} you caught a \"{pokemon_name}\"!",
-#             colour=0x008080
-#         ))
-#     else:
-#         await message.channel.send("The pokemon ran away!")
-
-
 async def catch_pokemon(message, cache, sqlite_conn):
     """Perform the catch command on a pokemon specified by the user.
 
@@ -146,4 +105,3 @@ async def catch_pokemon(message, cache, sqlite_conn):
         ))
     else:
         await message.channel.send("The pokemon ran away!")
-
