@@ -8,6 +8,7 @@ from cachetools import TTLCache
 from pikamon.constants import COMMAND_PREFIX, Cache, DATABASE_CONFIG_PATH_ENV_VAR
 from pikamon.spawner.spawner import spawn
 from pikamon.commands.catch import catch_pokemon
+from pikamon.commands.register import get_registered_trainers, register_trainer
 from pikamon.database.connect import setup_database
 
 # TODO - Take path to configuration directory as command line parameter
@@ -21,19 +22,31 @@ logger = logging.getLogger(__name__)
 table_sql_path = os.environ.get(DATABASE_CONFIG_PATH_ENV_VAR)
 sqlite_conn = setup_database(table_sql_path=table_sql_path)
 cache = TTLCache(maxsize=Cache.MAX_SIZE, ttl=Cache.TTL)
+registered_trainers = get_registered_trainers(sqlite_conn)
 bot = commands.Bot(command_prefix=COMMAND_PREFIX)
 
 
 @bot.command()
+async def register(message):
+    """Register user as a Pokemon trainer
+
+    Command from discord: p!ka register
+    p!ka - Bot command prefix
+    register - Performs register action
+    """
+    await register_trainer(message.message, registered_trainers, sqlite_conn)
+
+
+@bot.command()
 async def catch(message):
-    """Catch a pokemon
+    """Performs a catch on a spawned pokemon
 
     Command from discord: p!ka catch <pokemon_name>
-    p!ka - Command prefix
-    catch - Command to perform
+    p!ka - Bot command prefix
+    catch - Performs catch on pokemon
     <pokemon_name> - Name of pokemon to catch
     """
-    await catch_pokemon(message.message, cache, sqlite_conn)
+    await catch_pokemon(message.message, cache, registered_trainers, sqlite_conn)
 
 
 @bot.event

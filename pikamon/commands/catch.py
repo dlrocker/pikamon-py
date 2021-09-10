@@ -10,7 +10,7 @@ from pikamon.constants import USER_TABLE, POKEMON_TABLE, MIN_POKEMON_LEVEL, MAX_
 logger = logging.getLogger(__name__)
 
 
-def __catch_pokemon(message, cache, sqlite_conn, pokemon_name):
+def __catch_pokemon(message, cache, sqlite_conn, pokemon_name, author):
     """Internal logic to actually perform the "catch" command on the specified pokemon
 
     Parameters
@@ -23,30 +23,10 @@ def __catch_pokemon(message, cache, sqlite_conn, pokemon_name):
         SQLite Connection Object
     pokemon_name : str
         Name of the pokemon being caught
+    author : str
+        Name of the Discord user attempting to catch the Pokemon
     """
-    # TODO - Remove this when we implement user registration
-    # TODO - Issue - https://github.com/dlrocker/pikamon-py/issues/7
     cursor = sqlite_conn.cursor()
-
-    # use str(...) so that we get the username along with their unique username ID. Example: someuser#1234
-    author = str(message.author)
-    cursor.execute('''SELECT user_id from {} where user_id = "{}"'''.format(USER_TABLE, author))
-    result = cursor.fetchall()
-    if len(result) == 0:
-        # If user is not already in the table, add them
-        current_time = datetime.utcnow().strftime('%Y%m%d')
-        insert_user = '''INSERT INTO {table} (user_id, create_date, last_action_date) VALUES (?, ?, ?);'''.format(
-            table=USER_TABLE)
-        logger.debug("Executing the create user command: \"{}\"".format(insert_user))
-        values = (author, int(current_time), int(current_time))
-        logger.debug("Values ----- {}".format(values))
-        cursor.execute(
-            insert_user,
-            values
-        )
-        sqlite_conn.commit()
-    else:
-        logger.debug("User \"{}\" is already in the 'users' table".format(author))
 
     # TODO - Change so that we call out to the Pokemon API to verify the user specified the correct pokemon name
     #  As of right now, assume the user specified the correct pokemon
@@ -67,7 +47,7 @@ def __catch_pokemon(message, cache, sqlite_conn, pokemon_name):
             sqlite_conn.commit()
 
 
-async def catch_pokemon(message, cache, sqlite_conn):
+async def catch_pokemon(message, cache, registered_trainers, sqlite_conn):
     """Perform the catch command on a pokemon specified by the user.
 
     Parameters
@@ -76,6 +56,8 @@ async def catch_pokemon(message, cache, sqlite_conn):
         Discord message object which executed the pokemon bot catch command
     cache : cachetools.TTLCache
         A TTL LRU cache to store channels which contain spawned pokemon
+    registered_trainers : set of str
+        Cache of registered trainers
     sqlite_conn : sqlite3.Connection
         SQLite Connection Object
 
@@ -88,6 +70,16 @@ async def catch_pokemon(message, cache, sqlite_conn):
     """
     cache.expire()  # Remove any expired entries from the cache
 
+    # use str(...) so that we get the username along with their unique username ID. Example: someuser#1234
+    author = str(message.author)
+    if author not in registered_trainers:
+        await message.channel.send(embed=Embed(
+            description=f"Whoops! {message.author.mention} you are not a registered trainer! Please "
+            + "register before catching pokemon!",
+            colour=0x008080
+        ))
+        return
+
     message_content = message.content.lower().split(" ")
     if len(message_content) != 3:
         await message.channel.send("Invalid catch command!")
@@ -98,9 +90,9 @@ async def catch_pokemon(message, cache, sqlite_conn):
     pokemon_name = message_content[2]
     logger.debug(f"Performing catch on user specified pokemon \"{pokemon_name}\"...")
     if message.channel in cache:
-        __catch_pokemon(message, cache, sqlite_conn, pokemon_name)
+        __catch_pokemon(message, cache, sqlite_conn, pokemon_name, author)
         await message.channel.send(embed=Embed(
-            description=f"Congrats {message.author.mention} you caught a \"{pokemon_name}\"!",
+            description=f"Congratulations {message.author.mention}, you caught a \"{pokemon_name}\"!",
             colour=0x008080
         ))
     else:
