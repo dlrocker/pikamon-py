@@ -13,19 +13,26 @@ Create a server if you do not have on already
 
 Once you have a server, you need to get a OAuth token for your bot
 1. Go to the developer portal: https://discord.com/developers/applications/
-2. Give your bot a name, and optionally a description and image. I called mine `PikamonBot`.
+2. Give your bot a name, and optionally a description and image. Example: `PikamonBot`.
 3. Save your changes
 4. Go to the `Bot` menu on the left-hand side
 5. Click `Add Bot` and then `Yes, do it!`
-6. Under the `TOKEN` section click either `Click to Reveal Token` or `Copy` to copy the token. This is the OAuth token your bot will use when connecting to your server.
+6. Under the `TOKEN` section click either `Click to Reveal Token` or `Copy` to copy the token. This is the OAuth token your bot will use when connecting to your server. **Save this permanently and do not lose this.**
 
 Add the bot to the discord server
 1. On the developer portal, go to the OAuth menu on the left-hand side
 2. Under the `SCOPES` section check the box for `bot`
-3. Once you do this, a URL will appear. Copy this for later.
+3. Once you do this, a URL will appear. **Save this for later - do not lose this URL.** You will need this URL again if you wish to connect your bot to another server.
 4. Under the `BOT PERMISSIONS` section check the boxes for `Read Message History` and `Send Messages`
 5. Navigate to the bot URL you copied in the previous step in a browser
 6. A page will come up which will prompt you to select a server. Select the server you wish to add the bot to, then select `Authorize`.
+
+### Adding the bot to a new server
+At this point, your bot has already been registered. You already have a OAuth token for your bot that you have saved. If you still have the URL you saved in step 3 under `Add the bot to the discord server`, then adding the bot to a new server is as easy as doing the following:
+- Navigate to the bot URL
+- Select the new server you wish to add the bot to, then select `Authorize`
+
+And that's it! A single instance of your bot will now work across multiple servers, and it will maintain data between each. What this means is that if the same user is on multiple servers which contain the bot, then that user can catch Pokemon on any server and have it saved to their account. They can then list their caught Pokemon on any server, and it will show Pokemon caught from any server.
 
 # Running the Bot
 To run the bot, simply run `bot.py`. Note that before you do this, you must set the following environment variables:
