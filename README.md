@@ -37,8 +37,11 @@ And that's it! A single instance of your bot will now work across multiple serve
 # Running the Bot locally
 To run the bot, simply run `bot.py`. Note that before you do this, you must set the following environment variables:
 - `TOKEN`: Your OAuth token from when you created the bot
+- `LOGGING_CONFIG_JSON`: Path to logging configuration file on the system
 - `DATABASE_CONFIG_PATH`: Path to the SQL definition files of the SQLite tables for the Pikamon bot. By default,
     it is under this projects [database configuration](https://github.com/dlrocker/pikamon-py/tree/main/configuration/database) directory.
+- `SQLITE_DATA_PATH`: Directory path for where the SQLite database should be stored. If no path is provided, then the
+   SQLite data will be stored in the same directory as `pikamon/bot.py`.
 
 Different IDEs and editors have different ways to do this. Here are a few ways to do this:
 - Use a `.env` file
