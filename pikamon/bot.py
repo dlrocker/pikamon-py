@@ -5,23 +5,27 @@ import logging.config
 from discord.ext import commands
 from cachetools import TTLCache
 
-from pikamon.constants import COMMAND_PREFIX, Cache, SqliteDB
+from pikamon.constants import DISCORD_OAUTH_TOKEN, COMMAND_PREFIX, LOGGING_CONFIG_JSON, Cache, SqliteDB
 from pikamon.spawner.spawner import spawn
 from pikamon.commands.catch import catch_pokemon
 from pikamon.commands.register import get_registered_trainers, register_trainer
 from pikamon.commands.list import list_pokemon
 from pikamon.database.connect import setup_database
 
-# TODO - Take path to configuration directory as command line parameter
-LOGGING_CONFIG_FILE = os.path.dirname(os.path.realpath(__file__)) + "/../configuration/logging.json"
+LOGGING_CONFIG_FILE = os.environ.get(
+    LOGGING_CONFIG_JSON,
+    os.path.dirname(os.path.realpath(__file__)) + "/../configuration/logging.json"
+)
 with open(LOGGING_CONFIG_FILE, 'r') as f:
     logging_config = json.load(f)
 logging.config.dictConfig(logging_config)
 logger = logging.getLogger(__name__)
 
 
+sqlite_database_path = os.environ.get(SqliteDB.DATABASE_STORAGE_PATH)
 table_sql_path = os.environ.get(SqliteDB.DATABASE_CONFIG_PATH_ENV_VAR)
-sqlite_conn = setup_database(table_sql_path=table_sql_path)     # SQLite Database connection object
+sqlite_conn = setup_database(
+    database_path=sqlite_database_path, table_sql_path=table_sql_path)     # SQLite Database connection object
 cache = TTLCache(maxsize=Cache.MAX_SIZE, ttl=Cache.TTL)         # TTL Cache for spawned pokemon
 registered_trainers = get_registered_trainers(sqlite_conn)      # Already registered trainers
 bot = commands.Bot(command_prefix=COMMAND_PREFIX)
@@ -86,5 +90,5 @@ async def on_message(message):
         await spawn(message, cache)
 
 
-oauth_token = os.environ.get("TOKEN")
+oauth_token = os.environ.get(DISCORD_OAUTH_TOKEN)
 bot.run(oauth_token)

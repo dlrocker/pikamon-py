@@ -133,3 +133,6 @@ dmypy.json
 
 # Ignore SQLite database
 pikamon/pokemon.db
+
+# Never commit env_vars.txt in case user accidently puts in their OAuth token
+env_vars.txt

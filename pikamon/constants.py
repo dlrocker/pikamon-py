@@ -1,11 +1,19 @@
+# Discord OAuth connection token environment variable
+DISCORD_OAUTH_TOKEN = "TOKEN"
+
 # Prefix used for the Bot commands
 COMMAND_PREFIX = "p!ka "
 
+# Logging configuration file environment variable
+LOGGING_CONFIG_JSON = "LOGGING_CONFIG_JSON"
 
 class SqliteDB:
     """SQLite database tables"""
     # Database environment variable that specifies the table configuration path on the system
     DATABASE_CONFIG_PATH_ENV_VAR = "DATABASE_CONFIG_PATH"
+
+    # Database environment variable the specifies where on the system the SQLite database data will be stored.
+    DATABASE_STORAGE_PATH = "SQLITE_DATA_PATH"
 
     DATABASE_NAME = "pokemon.db"    # SQLite database name
     USER_TABLE = "users"            # User table
