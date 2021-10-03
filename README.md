@@ -34,7 +34,7 @@ At this point, your bot has already been registered. You already have a OAuth to
 
 And that's it! A single instance of your bot will now work across multiple servers, and it will maintain data between each. What this means is that if the same user is on multiple servers which contain the bot, then that user can catch Pokemon on any server and have it saved to their account. They can then list their caught Pokemon on any server, and it will show Pokemon caught from any server.
 
-# Running the Bot
+# Running the Bot locally
 To run the bot, simply run `bot.py`. Note that before you do this, you must set the following environment variables:
 - `TOKEN`: Your OAuth token from when you created the bot
 - `DATABASE_CONFIG_PATH`: Path to the SQL definition files of the SQLite tables for the Pikamon bot. By default,
@@ -44,3 +44,37 @@ Different IDEs and editors have different ways to do this. Here are a few ways t
 - Use a `.env` file
 - Add the environment variable to your execution configuration (if using something such as PyCharm, there is a section where you can define environment variables)
 - Manually export the variable if using a UNIX environment
+
+# Running the Bot locally as a Docker container
+The below instructions assume that you already have Docker installed on the host system where you will run the
+Pikamon Bot container. If you do not already have Docker installed, then follow the directions on
+the [Get Docker](https://docs.docker.com/get-docker/) webpage. Once you have installed Docker, continue with the
+below instructions.
+
+1. Create an environment configuration file named `env_vars.txt` for the Docker image:
+    ```
+    # Your Discord Bot OAuth token. REPLACE BEFORE STARTING BOT WITH YOUR TOKEN
+    TOKEN=<bot_token>
+    # Path to logging configuration file in the Docker container
+    LOGGING_CONFIG_JSON=/bot/configuration/logging.json
+    # Directory path for SQLite database configuration files
+    DATABASE_CONFIG_PATH=/bot/configuration/database
+    # Directory path for where the SQLite database should be stored
+    SQLITE_DATA_PATH=/bot/data
+    ```
+   Be sure to replace `<bot_token>` with your OAuth token.
+
+2. Build the bot using Docker
+    ```
+    docker build -t pikamon:latest .
+    ```
+3. Run the bot providing the environment variable
+    ```
+    docker run --env-file <path to env_vars.txt> pikamon:latest
+    ```
+   Be sure to replace `<path to env_vars.txt>` with the path to the `env_vars.txt` file you created
+   as part of step 1.
+
+
+Note: With these instructions the Docker container will not be mounting a volume for the SQLite database. If you wish
+to persist the SQLite database between run, then follow the [Docker Volume Mount documentation](https://docs.docker.com/storage/volumes/).
