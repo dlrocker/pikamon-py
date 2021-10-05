@@ -17,4 +17,5 @@ def sqlite_conn():
     conn = setup_database(TEST_DB_PATH, TEST_DB)
     yield conn
     conn.close()
-    os.remove(TEST_DB)
+    if os.path.exists(TEST_DB):
+        os.remove(TEST_DB)
