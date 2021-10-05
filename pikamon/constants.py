@@ -7,6 +7,7 @@ COMMAND_PREFIX = "p!ka "
 # Logging configuration file environment variable
 LOGGING_CONFIG_JSON = "LOGGING_CONFIG_JSON"
 
+
 class SqliteDB:
     """SQLite database tables"""
     # Database environment variable that specifies the table configuration path on the system
@@ -25,7 +26,7 @@ class Pokemon:
     SPAWN_RATE = 1
 
     # Maximum allowed pokemon ID that the pokemon API supports
-    MAX_ID = 807
+    MAX_ID = 898
 
     # Minimum/Maximum pokemon level
     MIN_LEVEL = 1
@@ -35,7 +36,7 @@ class Pokemon:
 class Cache:
     """Constants class for Time To Live (TTL) Cache"""
     MAX_SIZE = 258  # Max number of channels supported
-    TTL = 20        # Max lifetime of channel in cache - in seconds
+    TTL = 60        # Max lifetime of channel in cache - in seconds
 
 
 class DiscordMessage:

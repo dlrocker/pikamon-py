@@ -2,5 +2,6 @@
 discord
 cachetools
 requests
+aiohttp
 # Test requirements
 pytest
